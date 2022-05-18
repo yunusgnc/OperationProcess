@@ -1,0 +1,23 @@
+{
+  "name": "discordjs-starter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@replit/database": "^2.0.1",
+    "diagnostics_channel": "^1.1.0",
+    "discord-buttons": "^4.0.0-deprecated",
+    "discord.js": "^13.6.0",
+    "string-similarity": "^4.0.4",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.2",
+    "weather-js": "^2.0.0"
+  }
+}
