@@ -45,7 +45,6 @@ client.on('interactionCreate', interaction => {
   if(interaction.customId=="bolum"){
     var box = {'bolum':interaction.values[0]};
     const msg_filter = (m) => m.author.id === interaction.user.id;
-  console.log(interaction);
   interaction.message.channel.send("Adınızı ve Soyadınızı Giriniz")
     .then(() => {interaction.message.channel.awaitMessages({
            filter: msg_filter,
@@ -54,7 +53,24 @@ client.on('interactionCreate', interaction => {
           errors: ['time']
         })
     .then((collected)=>{
-      console.log(collected.first().content)
+      box["isim"] = collected.first().content
+      interaction.message.channel.send("Numaranızı Giriniz")
+      .then(()=>{interaction.message.channel.awaitMessages({
+        filter: msg_filter,
+        max:1,
+        time:30000,
+        error: ['time']
+      })
+      .then(collected=>{
+        collected.first().content  
+      db.set(collected.first().content.toString(),box).then(() => {
+        interaction.message.channel.send("Başarıyla Kaydoldunuz.")
+      });
+        
+        
+      })
+    })
+      
     })
 });
   }
@@ -86,8 +102,26 @@ client.on("message", (msg) => {
     msg.reply(msg.author.displayAvatarURL());
   }
 
+  else if (msg.content == "datalist" && msg.author.id== 798598304023707679){
+    db.list().then(keys => {
+      keys.forEach(key =>{
+        var current_key = key
+        db.get(key).then(value=>{
+        msg.author.send(`${current_key} : ${value["isim"]} | ${value["bolum"]}\n`)
+        
+        
+        })
+      })
+    
+      
+    });
+    
+  }
+
+
+  
   //Bot yardım özlellikleri
-  if (msg.content == "!help") {
+  else if (msg.content == "!help") {
     helpForUser(msg.channel);
   }
 
@@ -113,6 +147,9 @@ client.on("message", (msg) => {
       }
     );
   }
+  if (msg.content.startsWith("soru")){
+    readQuestionFile(msg);
+  }
 });
 
 // Küfürlü kelime dosyasını okuma.
@@ -127,6 +164,26 @@ function ReadBadwordsFile(mybox) {
     console.error(err);
   }
 }
+function readQuestionFile(msg){
+  const jsonData = require("./sorular.json");
+  a = Object.keys(jsonData)
+  var s = 0
+  a.forEach(item=>{
+    var percentage=stringSimilarity.compareTwoStrings(item,msg.content.toString().slice(5))
+    console.log(percentage)
+      if (percentage>= 0.56){
+        msg.channel.send(jsonData[item])
+        s = 1
+      }
+    
+  })
+  if (s == 0){
+    client.users.fetch('798598304023707679').then((user) => {
+      user.send(`${msg.author.id} = ${msg.author} sorusu: ${msg.content}`)
+}).catch(console.error);
+  }
+}
+
 
 function readJsonFile(msg) {
   const jsonData = require("./sss.json");
